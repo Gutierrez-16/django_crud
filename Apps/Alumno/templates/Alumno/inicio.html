@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Estudiantes - CRUD</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-primary text-white text-center py-3">
+        <h1>Gestión de Estudiantes</h1>
+    </header>
+    <main class="container mt-5">
+        <div class="add-student mb-5 text-right">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+                <i class="fas fa-plus"></i> Agregar Estudiante
+            </button>
+        </div>
+        <div class="student-list">
+            <h2>Lista de Estudiantes</h2>
+            <div class="form-group" style="max-width: 300px; margin-left: auto;">
+                <div class="input-group">
+                    <input type="text" id="buscarEstudiante" class="form-control form-control-sm" placeholder="Buscar estudiante...">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            
+            <table id="studentTable" class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Edad</th>
+                        <th>Sexo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            <nav aria-label="Page navigation example">
+                <ul id="pagination" class="pagination justify-content-end">
+                </ul>
+            </nav>
+        </div>
+
+        {% for alumno in alumnos %}
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal{{ alumno.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ alumno.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{% url 'editar_estudiante' alumno.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel{{ alumno.id }}">Editar Estudiante</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nombre{{ alumno.id }}">Nombre:</label>
+                                <input type="text" id="nombre{{ alumno.id }}" name="nombre" class="form-control" value="{{ alumno.nombre }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edad{{ alumno.id }}">Edad:</label>
+                                <input type="number" id="edad{{ alumno.id }}" name="edad" class="form-control" value="{{ alumno.edad }}" required min="1" max="99">
+                            </div>
+                            <div class="form-group">
+                                <label for="sexo{{ alumno.id }}">Sexo:</label>
+                                <select id="sexo{{ alumno.id }}" name="sexo" class="form-control" required>
+                                    <option value="M" {% if alumno.sexo == "M" %}selected{% endif %}>Masculino</option>
+                                    <option value="F" {% if alumno.sexo == "F" %}selected{% endif %}>Femenino</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ alumno.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ alumno.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{% url 'eliminar_estudiante' alumno.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel{{ alumno.id }}">Eliminar Estudiante</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Está seguro de que desea eliminar al estudiante <span class="text-danger">{{ alumno.nombre }}</span>?</p>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Add Modal -->
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{% url 'crear_estudiante' %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addModalLabel">Agregar Estudiante</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nombre">Nombre:</label>
+                                <input type="text" id="nombre" name="nombre" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edad">Edad:</label>
+                                <input type="number" id="edad" name="edad" class="form-control" required min="1" max="99">
+                            </div>
+                            <div class="form-group">
+                                <label for="sexo">Sexo:</label>
+                                <select id="sexo" name="sexo" class="form-control" required>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Agregar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        var alumnos = [
+            {% for alumno in alumnos %}
+            {
+                "id": "{{ alumno.id }}",
+                "nombre": "{{ alumno.nombre }}",
+                "edad": "{{ alumno.edad }}",
+                "sexo": "{{ alumno.sexo }}"
+            },
+            {% endfor %}
+        ];
+
+        var currentPage = 1;
+        var itemsPerPage = 5;
+
+        function renderAlumnos(page) {
+            var startIndex = (page - 1) * itemsPerPage;
+            var endIndex = startIndex + itemsPerPage;
+            var paginatedAlumnos = alumnos.slice(startIndex, endIndex);
+
+            var tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; 
+
+            paginatedAlumnos.forEach(function(alumno) {
+                var row = `
+                    <tr>
+                        <td>
+                            ${alumno.nombre}
+                            ${alumno.sexo === 'M' ? '<i class="fas fa-male text-primary"></i>' : '<i class="fas fa-female text-danger"></i>'}
+                        </td>
+                        <td>${alumno.edad}</td>
+                        <td>${alumno.sexo}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#editModal${alumno.id}">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal${alumno.id}">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </button>
+                        </td>
+                    </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function setupPagination() {
+            var paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = ''; 
+
+            var pageCount = Math.ceil(alumnos.length / itemsPerPage);
+            for (var i = 1; i <= pageCount; i++) {
+                var button = `<li class="page-item ${i === 1 ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+                paginationContainer.innerHTML += button;
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderAlumnos(currentPage);
+
+            var paginationContainer = document.getElementById('pagination');
+            var items = paginationContainer.getElementsByTagName('li');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+            items[currentPage - 1].classList.add('active');
+        }
+
+        setupPagination();
+        renderAlumnos(currentPage);
+
+        $(document).ready(function() {
+            $('#buscarEstudiante').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('#tableBody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#buscarEstudiante').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                var tableBody = $('#tableBody');
+                tableBody.html(''); 
+    
+                alumnos.forEach(function(alumno) {
+                    if (alumno.nombre.toLowerCase().indexOf(value) > -1 || value === '') {
+                        var row = `
+                            <tr>
+                                <td>
+                                    ${alumno.nombre}
+                                    ${alumno.sexo === 'M' ? '<i class="fas fa-male text-primary"></i>' : '<i class="fas fa-female text-danger"></i>'}
+                                </td>
+                                <td>${alumno.edad}</td>
+                                <td>${alumno.sexo}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#editModal${alumno.id}">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal${alumno.id}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>`;
+                        tableBody.append(row);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

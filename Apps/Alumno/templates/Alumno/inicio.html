@@ -33,7 +33,7 @@
             </div>
             
             <table id="studentTable" class="table table-striped">
-                <thead class="thead-dark">
+                <thead class="table-info">
                     <tr>
                         <th>Nombre</th>
                         <th>Edad</th>
@@ -193,10 +193,10 @@
                         <td>${alumno.edad}</td>
                         <td>${alumno.sexo}</td>
                         <td>
-                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#editModal${alumno.id}">
+                            <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#editModal${alumno.id}">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
-                            <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal${alumno.id}">
+                            <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal${alumno.id}">
                                 <i class="fas fa-trash-alt"></i> Eliminar
                             </button>
                         </td>

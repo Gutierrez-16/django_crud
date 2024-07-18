@@ -10,14 +10,33 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .header-gradient {
+            background: linear-gradient(270deg, #007bff, #00c6ff, #007bff);
+            background-size: 600% 600%;
+            animation: gradientAnimation 10s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header class="bg-primary text-white text-center py-3">
+    <header class="bg-primary text-white text-center py-3 header-gradient">
         <h1>Gestión de Estudiantes</h1>
     </header>
     <main class="container mt-5">
         <div class="add-student mb-5 text-right">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#addModal">
                 <i class="fas fa-plus"></i> Agregar Estudiante
             </button>
         </div>
